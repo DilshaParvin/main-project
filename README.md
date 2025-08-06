@@ -38,21 +38,21 @@ It allows users to create, share, explore, and interact with recipes — combini
    git clone https://github.com/DilshaParvin/flavorshare.git
    cd flavorshare
 
-# 2. Create and activate a virtual environment
+2. Create and activate a virtual environment
 python -m venv venv
 venv\Scripts\activate       # For Windows
 # source venv/bin/activate  # For macOS/Linux
 
-# 3. Install dependencies
+3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Apply database migrations
+4. Apply database migrations
 python manage.py migrate
 
-# 5. (Optional) Create a superuser for admin access
+5. (Optional) Create a superuser for admin access
 python manage.py createsuperuser
 
-# 6. Run the development server
+6. Run the development server
 python manage.py runserver
 
 Then open your browser and go to:
