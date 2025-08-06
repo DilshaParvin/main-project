@@ -1,0 +1,15 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block title %}Approval Pending - FlavorShare{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="height: 70vh;">
+  <div class="text-center p-5 shadow-lg border rounded-4 bg-white" style="max-width: 500px;">
+    <img src="{% static 'images/logo.png' %}" alt="FlavorShare Logo" width="80" class="mb-3">
+    <h2 class="mb-3" style="color: #ff6ec4;">⏳ Approval Pending</h2>
+    <p class="text-muted">Your restaurant profile is awaiting admin approval. You’ll be notified once approved.</p>
+    <a href="{% url 'logout' %}" class="btn btn-outline-secondary mt-3">Logout</a>
+  </div>
+</div>
+{% endblock %}

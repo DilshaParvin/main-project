@@ -1,0 +1,72 @@
+{% extends 'base3.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  .promo-card {
+    max-width: 600px;
+    margin: auto;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .promo-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .promo-image {
+    object-fit: cover;
+    height: 450px;
+  }
+
+  .promo-profile-pic {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+
+  .profile-link {
+    color: #e74c3c;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .profile-link:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="container mt-5">
+  <div class="promo-card">
+    {% if promotion.image %}
+      <img src="{{ promotion.image.url }}" class="card-img-top promo-image" alt="{{ promotion.title }}">
+    {% endif %}
+    <div class="card-body">
+      <h4 class="card-title text-dark fw-bold">{{ promotion.title }}</h4>
+      <p class="card-text text-dark">{{ promotion.description }}</p>
+
+      <div class="text-muted small mb-2">
+        <strong>Start Date:</strong> {{ promotion.start_date }}
+        <br>
+        <strong>End Date:</strong> {{ promotion.end_date }}
+      </div>
+
+      <div class="d-flex align-items-center mt-3">
+        {% if promotion.restaurant.profile_picture %}
+          <img src="{{ promotion.restaurant.profile_picture.url }}" class="promo-profile-pic">
+        {% endif %}
+        <a href="{% url 'public_profile' promotion.restaurant.id %}" class="profile-link">
+          {{ promotion.restaurant.username }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

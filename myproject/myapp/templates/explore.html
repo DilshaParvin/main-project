@@ -1,0 +1,204 @@
+{% extends 'base3.html' %}
+{% load static %}
+
+{% block title %}Explore - FlavorShare{% endblock %}
+
+{% block content %}
+<style>
+  
+  .card-glass {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .recipe-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .author-info {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  .tag-badge {
+    background-color: #ffe0b2;
+    color: #333;
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="row">
+    {% for recipe in explore_recipes %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card-glass">
+          {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-img mb-2">
+          {% endif %}
+          <h5 class="mb-1">{{ recipe.title }}</h5>
+          <p class="author-info mb-1">
+            by 
+            <a href="{% url 'public_profile' recipe.author.id %}" class="text-decoration-none">
+              {% if recipe.author.user_type == 'restaurant' %}
+                {{ recipe.author.restaurant_name }}
+              {% else %}
+                {{ recipe.author.get_full_name }}
+              {% endif %}
+            </a>
+            &middot; {{ recipe.updated_at|date:"M d, Y" }}
+          </p>
+          <p class="text-muted small mb-2">{{ recipe.description|truncatewords:15 }}</p>
+          <div class="mb-2">
+            {% for tag in recipe.tags.all %}
+              <span class="badge tag-badge">{{ tag.name }}</span>
+            {% endfor %}
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <button class="btn btn-like" data-recipe-id="{{ recipe.id }}">
+                <i class="bi bi-heart{% if user in recipe.likes.all %}-fill text-danger{% endif %}"></i>
+                <span class="likes-count">{{ recipe.likes.count }}</span>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#shareModal" data-recipe-id="{{ recipe.id }}">
+                <i class="bi bi-share"></i>
+              </button>
+            </div>
+            <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+          </div>
+          {% if request.user != recipe.author %}
+            <button class="btn btn-sm follow-btn {% if recipe.author.id in followed_user_ids %}btn-secondary{% else %}btn-outline-primary{% endif %}"
+                    data-user-id="{{ recipe.author.id }}"
+                    data-following="{% if recipe.author.id in followed_user_ids %}true{% else %}false{% endif %}">
+              {% if recipe.author.id in followed_user_ids %}Following{% else %}Follow{% endif %}
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">No recipes found to explore.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Share Modal (reuse from feed) -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title">Send to...</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control mb-3" id="userSearchInput" placeholder="Type a username...">
+        <ul class="list-group" id="userSearchResults"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function updateFollowButtons(userId, isNowFollowing) {
+      const allButtons = document.querySelectorAll(`.follow-btn[data-user-id="${userId}"]`);
+      allButtons.forEach(btn => {
+        btn.dataset.following = isNowFollowing.toString();
+        btn.textContent = isNowFollowing ? 'Following' : 'Follow';
+        btn.classList.toggle('btn-outline-primary', !isNowFollowing);
+        btn.classList.toggle('btn-secondary', isNowFollowing);
+      });
+    }
+
+    document.querySelectorAll('.follow-btn').forEach(button => {
+      button.addEventListener('click', function () {
+        const userId = this.dataset.userId;
+        const isFollowing = this.dataset.following === 'true';
+        const url = isFollowing ? `/unfollow/${userId}/` : `/follow/${userId}/`;
+
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            updateFollowButtons(userId, !isFollowing);
+          } else {
+            alert('Something went wrong.');
+          }
+        });
+      });
+    });
+
+    document.querySelectorAll('.btn-like').forEach(button => {
+      button.addEventListener('click', function () {
+        const recipeId = this.dataset.recipeId;
+
+        fetch(`/recipe/${recipeId}/like/`, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(res => res.json())
+        .then(data => {
+          const icon = this.querySelector('i');
+          const countSpan = this.querySelector('.likes-count');
+          if (data.liked) {
+            icon.classList.add('bi-heart-fill', 'text-danger');
+            icon.classList.remove('bi-heart');
+          } else {
+            icon.classList.remove('bi-heart-fill', 'text-danger');
+            icon.classList.add('bi-heart');
+          }
+          countSpan.textContent = data.likes_count;
+        });
+      });
+    });
+
+    let selectedRecipeId = null;
+    const shareModal = document.getElementById('shareModal');
+    shareModal.addEventListener('show.bs.modal', function (event) {
+      selectedRecipeId = event.relatedTarget.getAttribute('data-recipe-id');
+    });
+
+    document.getElementById("userSearchInput").addEventListener("input", function () {
+      const query = this.value;
+      const resultsContainer = document.getElementById("userSearchResults");
+
+      if (!query) {
+        resultsContainer.innerHTML = '';
+        return;
+      }
+
+      fetch(`/search-users/?q=${query}`)
+        .then(res => res.json())
+        .then(data => {
+          resultsContainer.innerHTML = '';
+
+          if (data.results.length === 0) {
+            resultsContainer.innerHTML = '<li class="list-group-item text-muted">No users found.</li>';
+          } else {
+            data.results.forEach(user => {
+              const item = document.createElement("li");
+              item.className = "list-group-item d-flex align-items-center justify-content-between";
+              const profileImg = user.profile_picture || '{% static "default_profile.png" %}';
+              item.innerHTML = `
+                <div class="d-flex align-items-center">
+                  <img src="${profileImg}" class="rounded-circle me-2" width="40" height="40" alt="Profile">
+                  <span>@${user.username}</span>
+                </div>
+                <a href="/conversation/${user.id}/?share_recipe=${selectedRecipeId}" class="btn btn-sm btn-primary">Send</a>
+              `;
+              resultsContainer.appendChild(item);
+            });
+          }
+        });
+    });
+  });
+</script>
+{% endblock %}
+

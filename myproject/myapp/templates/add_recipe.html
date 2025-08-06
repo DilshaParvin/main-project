@@ -1,0 +1,87 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block title %}Add Recipe - FlavorShare{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+  <div class="card shadow-lg border-0">
+    <div class="card-header text-white text-center py-4" style="background: linear-gradient(to right, #ff7e5f, #ff6ec4);">
+      <h3><i class="bi bi-plus-circle me-2"></i>Add New Recipe</h3>
+      <p class="mb-0">Share your delicious ideas with the world!</p>
+    </div>
+
+    <div class="card-body px-5">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label for="title" class="form-label">Recipe Title</label>
+          <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Short Description</label>
+          <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="ingredients" class="form-label">Ingredients <small class="text-muted">(one per line)</small></label>
+          <textarea class="form-control" id="ingredients" name="ingredients" rows="4" required></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="instructions" class="form-label">Instructions <small class="text-muted">(step by step)</small></label>
+          <textarea class="form-control" id="instructions" name="instructions" rows="5" required></textarea>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="cook_time" class="form-label">Cook Time (mins)</label>
+            <input type="number" class="form-control" id="cook_time" name="cook_time" required>
+          </div>
+          <div class="col-md-4">
+            <label for="servings" class="form-label">Servings</label>
+            <input type="number" class="form-control" id="servings" name="servings" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="difficulty" class="form-label">Difficulty</label>
+          <select class="form-select" id="difficulty" name="difficulty" required>
+            <option value="">Choose...</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="tags" class="form-label">Tags (comma-separated)</label>
+          <input type="text" class="form-control" id="tags" name="tags">
+        </div>
+
+        <div class="mb-3">
+          <label for="image" class="form-label">Image</label>
+          <input type="file" class="form-control" id="image" name="image">
+        </div>
+
+        {% if user.user_type == 'restaurant' %}
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="is_promoted" name="is_promoted">
+          <label class="form-check-label" for="is_promoted">
+            Promote this recipe 🍽️
+          </label>
+        </div>
+        {% endif %}
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary w-100 py-2" style="background: linear-gradient(to right, #ff7e5f, #ff6ec4); border: none;">
+            <i class="bi bi-upload me-1"></i> Share Recipe
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

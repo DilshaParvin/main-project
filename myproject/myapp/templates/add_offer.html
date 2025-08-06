@@ -1,0 +1,54 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block title %}Add Special Offer{% endblock %}
+
+{% block content %}
+<div class="profile-box mx-auto mt-4" style="max-width: 900px;">
+  <div class="profile-header d-flex align-items-center justify-content-between p-4 rounded-top"
+       style="background: linear-gradient(to right, #ff7e5f, #ff6ec4); color: white;">
+    
+    <h2 class="mb-0">Create Restaurant Promotion</h2>
+    <a href="{% url 'restaurant_dashboard' %}" class="btn btn-light rounded-pill">
+      <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <div class="px-4 py-4 bg-white">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <div class="mb-3">
+        <label for="title" class="form-label">Offer Title</label>
+        <input type="text" class="form-control" name="title" placeholder="e.g., 20% Off All Desserts" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" name="description" rows="4" placeholder="Details about your offer..." required></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="image" class="form-label">Upload Image (Optional)</label>
+        <input type="file" class="form-control" name="image">
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="start_date" class="form-label">Start Date</label>
+          <input type="date" class="form-control" name="start_date" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="end_date" class="form-label">End Date</label>
+          <input type="date" class="form-control" name="end_date" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn w-100 text-white fw-semibold" style="background: linear-gradient(to right, #ff7e5f, #ff6ec4); border: none;">
+        Create Offer
+      </button>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

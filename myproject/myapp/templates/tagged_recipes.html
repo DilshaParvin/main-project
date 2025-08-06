@@ -1,0 +1,28 @@
+{% extends 'base3.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Recipes tagged with #{{ tag.name }}</h2>
+
+  {% if recipes %}
+    <div class="row">
+      {% for recipe in recipes %}
+      <div class="col-md-6 mb-4">
+        <div class="card h-100">
+          {% if recipe.image %}
+          <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ recipe.title }}</h5>
+            <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
+            <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary">View Recipe</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No recipes found for this tag.</p>
+  {% endif %}
+</div>
+{% endblock %}

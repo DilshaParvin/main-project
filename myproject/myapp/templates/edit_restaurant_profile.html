@@ -1,0 +1,112 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block title %}Edit Restaurant Profile - FlavorShare{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 700px;">
+  <div class="card shadow-lg border-0">
+    <div class="card-header text-white text-center py-4" style="background: linear-gradient(to right, #ff7e5f, #ff6ec4);">
+      <h3><i class="bi bi-shop-window me-2"></i>Edit Restaurant Profile</h3>
+      <p class="mb-0">Update your restaurant details for a great impression!</p>
+    </div>
+    <div class="card-body px-5">
+      <form method="POST" enctype="multipart/form-data" onsubmit="return validateRestaurantForm()">
+
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label for="restaurant_name" class="form-label">Restaurant Name</label>
+          <input type="text" class="form-control" id="restaurant_name" name="restaurant_name" value="{{ user.restaurant_name }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="restaurant_location" class="form-label">Location</label>
+          <input type="text" class="form-control" id="restaurant_location" name="restaurant_location" value="{{ user.restaurant_location }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="contact_number" class="form-label">Contact Number <small class="text-muted">(optional)</small></label>
+          <input type="text" class="form-control" id="contact_number" name="contact_number" value="{{ user.contact_number }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="opening_hours" class="form-label">Opening Hours <small class="text-muted">(optional)</small></label>
+          <input type="text" class="form-control" id="opening_hours" name="opening_hours" placeholder="e.g. Mon-Sat: 9AM - 10PM" value="{{ user.opening_hours }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="bio" class="form-label">Bio</label>
+          <textarea class="form-control" id="bio" name="bio" rows="3">{{ user.bio }}</textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="profile_picture" class="form-label">Restaurant Logo</label><br>
+          {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" class="rounded mb-2" width="100">
+          {% endif %}
+          <input type="file" class="form-control" id="profile_picture" name="profile_picture">
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary w-100 py-2" style="background: linear-gradient(to right, #ff7e5f, #ff6ec4); border: none;">
+            <i class="bi bi-save me-1"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function validateRestaurantForm() {
+  const name = document.getElementById("restaurant_name").value.trim();
+  const location = document.getElementById("restaurant_location").value.trim();
+  const username = document.getElementById("username").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const contact = document.getElementById("contact_number").value.trim();
+  const openingHours = document.getElementById("opening_hours").value.trim();
+
+  // Basic required field check
+  if (!name || !location || !username || !email) {
+    alert("Please fill in all required fields.");
+    return false;
+  }
+
+  // Email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert("Please enter a valid email address.");
+    return false;
+  }
+
+  // Contact number validation (optional but must be 10 digits if filled)
+  if (contact && !/^\d{10}$/.test(contact)) {
+    alert("Please enter a valid 10-digit contact number.");
+    return false;
+  }
+
+  // Opening hours format: Mon-Sat: 9AM - 10PM
+  if (openingHours) {
+    const ohRegex = /^[A-Za-z]{3,}-[A-Za-z]{3,}:\s?\d{1,2}(AM|PM)\s?-\s?\d{1,2}(AM|PM)$/i;
+    if (!ohRegex.test(openingHours)) {
+      alert("Please enter opening hours in the format like: Mon-Sat: 9AM - 10PM");
+      return false;
+    }
+  }
+
+  return true; // Submit the form
+}
+</script>
+
+{% endblock %}

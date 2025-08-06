@@ -1,0 +1,80 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block title %}Edit Recipe - FlavorShare{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-header text-white text-center py-3" style="background: linear-gradient(to right, #ff7e5f, #ff6ec4);">
+      <h3>Edit Your Recipe</h3>
+    </div>
+    <div class="card-body px-4">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label class="form-label">Title</label>
+          <input type="text" name="title" class="form-control" value="{{ recipe.title }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control" rows="3" required>{{ recipe.description }}</textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Ingredients</label>
+          <textarea name="ingredients" class="form-control" rows="4" required>{{ recipe.ingredients }}</textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Instructions</label>
+          <textarea name="instructions" class="form-control" rows="4" required>{{ recipe.instructions }}</textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Cook Time (min)</label>
+            <input type="number" name="cook_time" class="form-control" value="{{ recipe.cook_time }}" required>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Servings</label>
+            <input type="number" name="servings" class="form-control" value="{{ recipe.servings }}" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Difficulty</label>
+          <select name="difficulty" class="form-select" required>
+            <option value="easy" {% if recipe.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+            <option value="medium" {% if recipe.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+            <option value="hard" {% if recipe.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Promote Recipe?</label><br>
+          <input type="checkbox" name="is_promoted" {% if recipe.is_promoted %}checked{% endif %}>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Recipe Image</label>
+          {% if recipe.image %}
+            <div class="mb-2">
+              <img src="{{ recipe.image.url }}" alt="Recipe Image" class="rounded" width="120">
+            </div>
+          {% endif %}
+          <input type="file" name="image" class="form-control">
+        </div>
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn text-white px-4 py-2" style="background: linear-gradient(to right, #ff7e5f, #ff6ec4); border: none;">
+            <i class="bi bi-save me-1"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
